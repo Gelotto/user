@@ -1,17 +1,25 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::Addr;
+use cosmwasm_std::{Addr, Uint64};
+use cw_lib::models::Owner;
+
+use crate::models::Profile;
 
 #[cw_serde]
-pub struct InstantiateMsg {}
+pub struct InstantiateMsg {
+  pub owner: Option<Owner>,
+}
 
 #[cw_serde]
 pub enum ExecuteMsg {
-  TransferOwnership { new_owner: Addr },
+  Register { profile: Profile },
 }
 
 #[cw_serde]
 pub enum QueryMsg {
-  Select { fields: Option<Vec<String>> },
+  Select {
+    fields: Option<Vec<String>>,
+    wallet: Option<Addr>,
+  },
 }
 
 #[cw_serde]
@@ -19,5 +27,11 @@ pub struct MigrateMsg {}
 
 #[cw_serde]
 pub struct SelectResponse {
-  pub owner: Option<Addr>,
+  pub owner: Option<Owner>,
+}
+
+#[cw_serde]
+pub enum UserQueryTarget {
+  Id(Uint64),
+  Address(Addr),
 }

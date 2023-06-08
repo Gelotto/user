@@ -1,3 +1,3 @@
-mod transfer_ownership;
+mod register;
 
-pub use transfer_ownership::transfer_ownership;
+pub use register::register;
