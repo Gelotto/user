@@ -14,4 +14,10 @@ pub enum ContractError {
 
   #[error("UserNotFound")]
   UserNotFound,
+
+  #[error("SessionExpired")]
+  SessionExpired,
+
+  #[error("SessionNotFound")]
+  SessionNotFound,
 }

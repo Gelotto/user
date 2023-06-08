@@ -1,6 +1,6 @@
 use crate::error::ContractError;
 use crate::execute;
-use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
+use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg, SessionMsg};
 use crate::query;
 use crate::state;
 use cosmwasm_std::entry_point;
@@ -31,6 +31,13 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
   match msg {
     ExecuteMsg::Register { profile } => execute::register(deps, env, info, profile),
+    ExecuteMsg::Session(msg) => match msg {
+      SessionMsg::Start { seed } => execute::session::start(deps, env, info, seed),
+      SessionMsg::End { seed } => execute::session::end(deps, env, info, seed),
+      SessionMsg::Refresh { old_seed, new_seed } => {
+        execute::session::refresh(deps, env, info, old_seed, new_seed)
+      },
+    },
   }
 }
 
