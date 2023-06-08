@@ -20,6 +20,7 @@ pub const USER_SESSIONS: Map<String, UserSession> = Map::new("sessions");
 pub const ADDRESS_TO_ID: Map<Addr, Uint64> = Map::new("address_to_id");
 pub const ID_2_ADDRESS: LookupTable<(u64, Addr)> = Map::new("id_2_addr");
 pub const ID_COUNTER: Item<Uint64> = Item::new("id_counter");
+pub const USER_COUNT: Item<u32> = Item::new("user_count");
 
 /// Initialize contract state data.
 pub fn initialize(
@@ -29,6 +30,7 @@ pub fn initialize(
   msg: InstantiateMsg,
 ) -> Result<(), ContractError> {
   ID_COUNTER.save(deps.storage, &Uint64::zero())?;
+  USER_COUNT.save(deps.storage, &0)?;
   OWNER.save(
     deps.storage,
     &msg.owner.unwrap_or(Owner::Address(info.sender.clone())),
@@ -77,17 +79,17 @@ pub fn require_valid_session(
   block: &BlockInfo,
   user_id: u64,
   key: &String,
-) -> Result<(), ContractError> {
+) -> Result<UserSession, ContractError> {
   if let Some(session) = USER_SESSIONS.may_load(storage, key.clone())? {
     let interval = USER_SESSION_TIMEOUTS.load(storage, user_id)?;
     let expires_at = session.refresh_time.seconds() + interval.u64();
     if block.time.seconds() > expires_at {
       return Err(ContractError::SessionExpired);
+    } else {
+      return Ok(session);
     }
-  } else {
-    return Err(ContractError::SessionNotFound);
   }
-  Ok(())
+  Err(ContractError::SessionNotFound)
 }
 
 pub fn init_user_id(
@@ -102,6 +104,7 @@ pub fn init_user_id(
   })?;
   ADDRESS_TO_ID.save(storage, addr.clone(), &id.into())?;
   ID_2_ADDRESS.save(storage, (id.u64(), addr.clone()), &true)?;
+  USER_COUNT.update(storage, |n| -> Result<_, ContractError> { Ok(n + 1) })?;
   Ok(id.u64())
 }
 

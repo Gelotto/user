@@ -2,6 +2,11 @@ use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Addr, Timestamp, Uint64};
 
 #[cw_serde]
+pub struct ContractMetadata {
+  pub n_users: u32,
+}
+
+#[cw_serde]
 pub struct UserProfile {
   pub username: Option<String>,
   pub description: Option<String>,

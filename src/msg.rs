@@ -2,7 +2,7 @@ use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Addr, Uint64};
 use cw_lib::models::Owner;
 
-use crate::models::UserProfile;
+use crate::models::{ContractMetadata, User, UserProfile};
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -24,6 +24,10 @@ pub enum ExecuteMsg {
 
 #[cw_serde]
 pub enum QueryMsg {
+  Session {
+    address: Addr,
+    seed: String,
+  },
   Select {
     fields: Option<Vec<String>>,
     wallet: Option<Addr>,
@@ -36,6 +40,8 @@ pub struct MigrateMsg {}
 #[cw_serde]
 pub struct SelectResponse {
   pub owner: Option<Owner>,
+  pub metadata: Option<ContractMetadata>,
+  pub user: Option<User>,
 }
 
 #[cw_serde]
